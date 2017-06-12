@@ -259,7 +259,7 @@ QMap<QString, QColor> colors = {
 	{"purple", 0x7e1e9c}
 };
 
-draw_area::draw_area(Settings &s, QWidget *parent) : QWidget(parent)
+draw_area::draw_area(const Settings &s, QWidget *parent) : QWidget(parent)
 {
 	image_width = s.width;
 	image_height = s.height;

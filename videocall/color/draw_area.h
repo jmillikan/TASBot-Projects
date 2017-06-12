@@ -13,7 +13,7 @@ class draw_area : public QWidget
 {
 		Q_OBJECT
 	public:
-		explicit draw_area(Settings &s, QWidget *parent = 0);
+		explicit draw_area(const Settings &s, QWidget *parent = 0);
 
 	public slots:
 		void register_color(QString color, unsigned int space);
