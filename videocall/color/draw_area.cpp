@@ -1,10 +1,9 @@
 #include "draw_area.h"
-#include "settings.h"
 #include <QDirIterator>
 #include <QPainter>
 #include <QDebug>
 
-#include <IrcBuffer> 
+#include <IrcBuffer>
 #include <QThread>
 
 QMap<QString, QColor> colors = {
@@ -234,7 +233,7 @@ QMap<QString, QColor> colors = {
 	{"lime", 0xaaff32},
 	{"periwinkle", 0x8e82fe},
 	{"peach", 0xffb07c},
-	{"black", 0x000000},
+	{"black", 0x000001},
 	{"lilac", 0xcea2fd},
 	{"beige", 0xe6daa6},
 	{"salmon", 0xff796c},
@@ -260,9 +259,12 @@ QMap<QString, QColor> colors = {
 	{"purple", 0x7e1e9c}
 };
 
-draw_area::draw_area(QWidget *parent) : QWidget(parent)
+draw_area::draw_area(Settings &s, QWidget *parent) : QWidget(parent)
 {
-	QDirIterator emo_it("../twitchemotes", QStringList() << "*.png", QDir::Files, QDirIterator::Subdirectories);
+	image_width = s.width;
+	image_height = s.height;
+	
+	QDirIterator emo_it(s.emotes_folder, QStringList() << "*.png", QDir::Files, QDirIterator::Subdirectories);
 	while (emo_it.hasNext()){
 		QString trigger = emo_it.fileName();
 		trigger.chop(4);
@@ -274,19 +276,19 @@ draw_area::draw_area(QWidget *parent) : QWidget(parent)
 		emo_it.next();
 	}
 
-	QDirIterator pic_it("../pictures", QStringList() << "*.png", QDir::Files, QDirIterator::Subdirectories);
+	QDirIterator pic_it(s.pictures_folder, QStringList() << "*.png", QDir::Files, QDirIterator::Subdirectories);
 	while (pic_it.hasNext()){
 		pictures.push_back(new QImage(pic_it.next()));
 	}
 
-	image = new QImage(SNES_WIDTH, SNES_HEIGHT, QImage::Format_RGB32);
+	image = new QImage(image_width, image_height, QImage::Format_RGB32);
 
 	for(int i = 0; i < pictures.count(); i++){
 		current_picture = i;
 		picture_coords.push_back({});
 		update_picture();
-		for(int x = 0; x < SNES_WIDTH; x++){
-			for(int y = 0; y < SNES_HEIGHT; y++){
+		for(int x = 0; x < image_width; x++){
+			for(int y = 0; y < image_height; y++){
 				if(image->pixel(x, y) == QColor(Qt::white).rgb()){
 					picture_coords[i].push_back({x, y});
 					flood_fill(x, y, Qt::white, Qt::black);
@@ -297,18 +299,18 @@ draw_area::draw_area(QWidget *parent) : QWidget(parent)
 	}
 	current_picture = 0;
 
-	setMinimumSize(SNES_WIDTH, SNES_HEIGHT);
+	setMinimumSize(image_width, image_height);
 
 	qputenv("IRC_DEBUG", "0");
 	
-	irc.setHost(IRC_HOST);
-	irc.setUserName("MrTASBot");
-	irc.setPassword(IRC_PASSWORD);
-	irc.setNickName("MrTASBot");
-	irc.setRealName("MrTASBot");
-	irc.join(IRC_CHANNEL);
-	irc.setPort(IRC_PORT);
-        irc.setSecure(IRC_USE_SSL);
+	irc.setHost(s.irc_host);
+	irc.setUserName(s.irc_bot_name);
+	irc.setPassword(s.irc_password);
+	irc.setNickName(s.irc_bot_name);
+	irc.setRealName(s.irc_bot_name);
+	irc.join(s.irc_channel);
+	irc.setPort(s.irc_port);
+	irc.setSecure(s.irc_use_ssl);
 	irc.setReconnectDelay(5);
 	irc.set_emotes(emotes.keys());
 	irc.set_colors(colors.keys());
@@ -404,7 +406,7 @@ void draw_area::flood_fill(int x, int y, QColor target_color, QColor new_color)
 		x++;
 		bool above = false;
 		bool below = false;
-		while(x < SNES_WIDTH && image->pixel(x, y) == target){
+		while(x < image_width && image->pixel(x, y) == target){
 			image->setPixel(x, y, new_color.rgb());
 
 			if(!above && y > 0 && image->pixel(x, y - 1) == target){
@@ -414,10 +416,10 @@ void draw_area::flood_fill(int x, int y, QColor target_color, QColor new_color)
 				above = false;
 			}
 
-			if(!below && y < SNES_HEIGHT - 1 && image->pixel(x, y + 1) == target){
+			if(!below && y < image_height - 1 && image->pixel(x, y + 1) == target){
 				stack.push({x, y + 1});
 				below = true;
-			}else if(below && y < SNES_HEIGHT - 1 && image->pixel(x, y + 1) != target){
+			}else if(below && y < image_height - 1 && image->pixel(x, y + 1) != target){
 				below = false;
 			}
 			x++;

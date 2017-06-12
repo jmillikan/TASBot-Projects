@@ -7,12 +7,13 @@
 #include <QKeyEvent>
 #include <QStack>
 #include "bot.h"
+#include "settings.h"
 
 class draw_area : public QWidget
 {
 		Q_OBJECT
 	public:
-		explicit draw_area(QWidget *parent = 0);
+		explicit draw_area(Settings &s, QWidget *parent = 0);
 
 	public slots:
 		void register_color(QString color, unsigned int space);
@@ -30,6 +31,8 @@ class draw_area : public QWidget
 		};
 
 		QImage *image;
+		int image_width;
+		int image_height;
 		QMap<QString, QPixmap *> emotes;
 		QVector<QImage *> pictures;
 		QVector<QVector<QPair<int, int>>> picture_coords;
