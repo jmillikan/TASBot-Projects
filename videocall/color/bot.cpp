@@ -60,9 +60,7 @@ void bot::processMessage(IrcPrivateMessage* message)
 	for(const auto emote : emotes){
 		if(!pieces[0].compare(emote)){
 			unsigned int coords = hash(message->nick().toLatin1().data());
-			unsigned int x = (coords >> 2) % (128 + 64);
-			unsigned int y = (coords >> 9) % (112 + 64);
-			emit trigger_emote(emote, x - 64, y - 64);
+			emit trigger_emote(emote, coords);
 			return;
 		}
 	}

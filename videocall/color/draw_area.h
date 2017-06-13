@@ -17,7 +17,7 @@ class draw_area : public QWidget
 
 	public slots:
 		void register_color(QString color, unsigned int space);
-		void register_emote(QString emote, int x, int y);
+		void register_emote(QString emote, int hash);
 		
 	protected:
 		void paintEvent(QPaintEvent *event);
@@ -26,8 +26,8 @@ class draw_area : public QWidget
 	private:
 		struct emote_location{
 			QString name;
-			int x;
-			int y;
+			unsigned int x;
+			unsigned int y;
 		};
 
 		QImage *image;

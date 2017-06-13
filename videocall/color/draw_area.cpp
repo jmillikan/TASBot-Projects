@@ -322,6 +322,17 @@ draw_area::draw_area(const Settings &s, QWidget *parent) : QWidget(parent)
 	irc.open();
 	update_picture();
 	setFocus();
+
+	register_emote("1", 738445360);
+	register_emote("1", 421479169);
+	register_emote("1", 627531767);
+	register_emote("1", 253228782);
+	register_emote("1", 67736462);
+	register_emote("1", 407745213);
+	register_emote("1", 239879689);
+	register_emote("1", 918016862);
+	register_emote("1", 795040187);
+	register_emote("1", 189778524);
 }
 
 void draw_area::register_color(QString color, unsigned int space)
@@ -342,8 +353,11 @@ void draw_area::register_color(QString color, unsigned int space)
 	qDebug() << "registered color" << color << space << space % picture_coords[current_picture].size();
 }
 
-void draw_area::register_emote(QString emote, int x, int y)
+void draw_area::register_emote(QString emote, int hash)
 {
+	unsigned int x = (hash >> 2) % (image_width - 64);
+	unsigned int y = (hash >> 9) % (image_height - 64);
+
 	registered_emotes.append({emote, x, y});
 	update();
 	qDebug() << "registered emote" << emote << x << y;

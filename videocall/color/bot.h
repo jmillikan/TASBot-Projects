@@ -15,7 +15,7 @@ class bot : public IrcConnection
 		 void set_colors(QList<QString> c){ colors = c; }
 
 	signals:
-		 void trigger_emote(QString emote, int x, int y);
+		 void trigger_emote(QString emote, int hash);
 		 void trigger_color(QString color, int space);
 		
 	public slots:
